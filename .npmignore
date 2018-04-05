@@ -1,0 +1,7 @@
+# Files not needed as part of npm package
+
+# TypeScript source
+src/
+
+# gitignore
+.gitignore

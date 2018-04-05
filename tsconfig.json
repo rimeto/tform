@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "outDir": "build",
+    "preserveConstEnums": true,
+    "pretty": true,
+    "removeComments": true,
+    "rootDir": "src",
+    "sourceMap": false,
+    "strict": true,
+    "target": "es6",
+    "emitDecoratorMetadata": true
+  },
+
+  "filesGlob": ["src/**/*.ts"],
+
+  "exclude": [
+    "node_modules",
+    "build",
+  ],
+
+  "compileOnSave": false
+}

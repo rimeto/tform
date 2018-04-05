@@ -1,0 +1,70 @@
+{
+  "name": "tform",
+  "version": "0.3.0",
+  "description": "Transform JSON records easily",
+  "main": "build/index.js",
+  "typings": "build/index.js",
+  "license": "MIT",
+  "repository": "github:rimeto/tform",
+  "scripts": {
+    "build": "./node_modules/typescript/bin/tsc --declaration",
+    "clean": "rm -rf build node_modules",
+    "lint": "tslint -c ./tslint.json src/**/*.ts",
+    "precommit": "lint-staged",
+    "prepublishOnly": "yarn build",
+    "test": "jest",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.2.2",
+    "@types/node": "^9.4.6",
+    "husky": "^0.14.3",
+    "jest": "^22.0.3",
+    "lint-staged": "^7.0.4",
+    "prettier": "^1.9.2",
+    "ts-jest": "^22.0.0",
+    "tslint": "^5.8.0",
+    "typescript": "2.6.2"
+  },
+  "jest": {
+    "collectCoverage": false,
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "roots": [
+      "src/"
+    ],
+    "testRegex": "/__tests__/(?!_).*$",
+    "transform": {
+      ".(ts|tsx)": "./node_modules/ts-jest/preprocessor.js"
+    }
+  },
+  "lint-staged": {
+    "concurrent": false,
+    "linters": {
+      "*.{ts,tsx}": [
+        "prettier --write",
+        "tslint -c ./tslint.json --fix",
+        "git add"
+      ]
+    }
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "printWidth": 120,
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.92",
+    "@types/reflect-metadata": "^0.1.0",
+    "jsc": "^0.3.11",
+    "lodash": "^4.17.4",
+    "npm": "^5.7.1",
+    "reflect-metadata": "^0.1.12"
+  },
+  "engines": {
+    "node": ">4"
+  }
+}

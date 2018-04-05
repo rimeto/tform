@@ -1,0 +1,25 @@
+{
+  "extends": ["tslint:latest"],
+  "rules": {
+    "object-literal-sort-keys": false,
+    "indent": [true, "spaces", 2],
+    "max-line-length": false,
+    "no-consecutive-blank-lines": [true, 2],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "any",
+        "named-imports-order": "case-insensitive"
+      }
+    ],
+    "quotemark": [true, "single", "avoid-escape"],
+    "no-console": false,
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore",
+      "allow-pascal-case"
+    ]
+  }
+}
