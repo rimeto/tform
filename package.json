@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": "github:rimeto/tform",
   "scripts": {
-    "build": "./node_modules/typescript/bin/tsc --declaration",
+    "build": "./node_modules/typescript/bin/tsc",
     "clean": "rm -rf build node_modules",
     "lint": "tslint -c ./tslint.json src/**/*.ts",
     "precommit": "lint-staged",
@@ -24,7 +24,7 @@
     "prettier": "^1.9.2",
     "ts-jest": "^22.0.0",
     "tslint": "^5.8.0",
-    "typescript": "2.6.2"
+    "typescript": "2.8.1"
   },
   "jest": {
     "collectCoverage": false,
@@ -58,11 +58,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.92",
-    "@types/reflect-metadata": "^0.1.0",
-    "jsc": "^0.3.11",
-    "lodash": "^4.17.4",
-    "npm": "^5.7.1",
-    "reflect-metadata": "^0.1.12"
+    "lodash": "^4.17.4"
   },
   "engines": {
     "node": ">4"

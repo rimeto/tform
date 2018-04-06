@@ -5,28 +5,38 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { IJSONRecord, IRules, splitList, Tform } from '../index';
+import { splitList, Tform, TformRules } from '../index';
 
 describe('tform', () => {
   test('basic transforming', () => {
     interface IPerson {
       job: string;
-      name: string;
+      name: {
+        first: string;
+        last: string;
+      };
       age: number;
+      hobbies: string[];
+      address: {
+        home: string;
+        work: string;
+      };
+    }
+
+    interface IRawRecord {
+      age?: number;
+      job: string;
+      name?: string;
       hobbies: string;
       address: {
         home: {
           city: string;
-          zip: number;
-        };
-        work: {
-          city: string;
-          zip: number;
+          zip: string | null;
         };
       };
     }
 
-    const record = {
+    const record: IRawRecord = {
       job: 'Engineer ',
       name: 'John Doe',
       hobbies: 'Biking, Skating,,',
@@ -38,26 +48,18 @@ describe('tform', () => {
       },
     };
 
-    const rules: IRules<IPerson> = {
-      job: (X) => X.job(), // test simply accessing attributes
+    const rules: TformRules<IRawRecord, IPerson> = {
+      job: (X) => X.job(''), // test simply accessing attributes
       name: {
         // test deep rules
-        first: (X) => X.name().split(' ')[0], // test type-checking on attributes
-        last: (X) => X.name().split(' ')[1],
+        first: (X) => X.name('abdc').split(' ')[0], // test type-checking on attributes
+        last: (X) => X.name('').split(' ')[1],
       },
       age: (X) => X.age(-1), // test falling back to default value
-      hobbies: (X) => splitList(',', X.hobbies()), // test utility method `splitList`
-      city: {
-        home: (X) =>
-          X.address()
-            .home({})
-            .city('')
-            .toLowerCase(), // test accessing nested properties
-        work: (X) =>
-          X.address()
-            .work({})
-            .city('Unknown')
-            .toLowerCase(), // demonstrate nesting with defaults
+      hobbies: (X) => splitList(',', X.hobbies('')), // test utility method `splitList`
+      address: {
+        home: (X) => X.address.home.city('').toLowerCase(), // test accessing nested properties
+        work: (X) => (X.address as any).work.city('Unknown').toLowerCase(), // demonstrate nesting with defaults
       },
     };
 
@@ -69,27 +71,27 @@ describe('tform', () => {
       },
       age: -1,
       hobbies: ['Biking', 'Skating'],
-      city: {
+      address: {
         home: 'cupertino',
         work: 'unknown',
       },
     };
 
-    const tform = new Tform<IPerson>(rules);
+    const tform = new Tform(rules);
     const output = tform.transform(record);
     expect(output).toEqual(expected);
   });
 
   test('basic error handling', () => {
-    const rules: IRules<any> = {
+    const rules: TformRules<{}, {}> = {
       error: () => {
         throw Error('oh noes!');
       },
-      missing: (X) => X.foo(),
+      missing: (X: any) => X.foo(),
     };
 
-    const record1: IJSONRecord = { foo: 1 };
-    const record2: IJSONRecord = {};
+    const record1 = { foo: 1 };
+    const record2 = {};
 
     const tform = new Tform(rules);
     expect(tform.transform(record1)).toEqual({ missing: 1 });
@@ -111,7 +113,7 @@ describe('tform', () => {
         recordRaw: {},
       },
       {
-        error: Error("property 'missing' of result is undefined"),
+        error: Error("Property 'missing' of result is undefined"),
         field: 'missing',
         recordId: undefined,
         recordNo: 2,
@@ -121,20 +123,20 @@ describe('tform', () => {
   });
 
   test('error reporting of record id', () => {
-    const rules: IRules<any> = {
-      missing: (X) => X.foo(),
+    const rules: TformRules<any, any> = {
+      missing: (X: any) => X.foo(),
     };
     const record1 = { pk: 1 };
     const record2 = {};
 
-    const tform = new Tform(rules, 'pk');
+    const tform = new Tform(rules, 'pk' as any);
     expect(tform.transform(record1)).toEqual({});
     expect(tform.transform(record2)).toEqual({});
     expect(tform.getErrors()).toEqual([
       {
-        error: Error("property 'missing' of result is undefined"),
+        error: Error("Property 'missing' of result is undefined"),
         field: 'missing',
-        recordId: 1,
+        recordId: '1',
         recordNo: 1,
         recordRaw: { pk: 1 },
       },
@@ -144,7 +146,7 @@ describe('tform', () => {
         recordRaw: {},
       },
       {
-        error: Error("property 'missing' of result is undefined"),
+        error: Error("Property 'missing' of result is undefined"),
         field: 'missing',
         recordId: undefined,
         recordNo: 2,

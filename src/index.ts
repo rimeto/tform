@@ -7,137 +7,91 @@
 
 import * as _ from 'lodash';
 
+import { RecordProxy, TformRecordDataType } from './RecordProxy';
 export * from './utility';
 
-// Define JSON interface.
+/**
+ * Tform rules definition given InRecord and OutRecord types.
+ */
+export type TformRules<InRecord, OutRecord> = {
+  [K in keyof OutRecord]: OutRecord[K] extends object
+    ? TformRules<InRecord, OutRecord[K]> | ((X: TformRecordDataType<InRecord>) => OutRecord[K])
+    : ((X: TformRecordDataType<InRecord>) => OutRecord[K])
+};
 
-export type JSONPrimitive = number | boolean | string | null;
-export type JSONValue = JSONPrimitive | IJSONArray | IJSONRecord;
-
-export interface IJSONArray extends Array<JSONValue> {}
-
-export interface IJSONRecord {
-  [key: string]: JSONValue;
-}
-
-function isPrimitive(obj: any): obj is JSONPrimitive {
-  return obj === null || obj === undefined || ['string', 'number', 'boolean'].indexOf(typeof obj) >= 0;
-}
-
-// Define rules interface.
-
-export type Rule<Record> = ((record: Record) => any) | IRulesInternal<Record>;
-
-// Internal definition of IRules, not wrapped with `Defaultable`.
-export interface IRulesInternal<Record> {
-  [key: string]: Rule<Record>;
-}
-
-// Given a record, convert properties to methods that optionally take a fallback value.
-// Note: Nested non-primitive properties are converted too.
-function wrapRecord<Record extends object, Key extends keyof Record>(record: Record) {
-  return new Proxy(record, {
-    get(target: Record, name: Key): (fallback?: any) => Key {
-      return (fallback: any) => {
-        const returnValue = target[name] !== undefined ? target[name] : fallback;
-        return isPrimitive(returnValue) ? returnValue : wrapRecord(returnValue);
-      };
-    },
-  });
-}
-
-// Convert record into wrapped version as per `wrapRecord`.
-export type Defaultable<Record> = { [key in keyof Record]: (fallback?: any) => Defaultable<Record[key]> };
-
-// IRules wrapped by `Defaultable` suitable for public use.
-export type IRules<Record> = IRulesInternal<Defaultable<Record>>;
-
-// Define main classes.
-
-export interface ITformError {
+/**
+ * Tform error
+ */
+export interface ITformError<InRecord> {
   error: Error;
   field?: string; // unset if record-level error instead of field-level error
 
   recordNo: number;
-  recordRaw: IJSONRecord;
-  recordId?: JSONValue; // unset if no `idKey` provided to `Tform` instance
+  recordRaw: InRecord;
+  recordId?: string; // unset if no `idKey` provided to `Tform` instance
 }
 
-// tslint:disable:member-ordering
-export class Tform<Record> {
-  private errors: ITformError[] = [];
+export class Tform<InRecord, OutRecord> {
+  private errors: Array<ITformError<InRecord>> = [];
   private recordCount: number = 0;
 
-  constructor(private rules: IRules<Record>, private idKey?: string) {}
+  constructor(private rules: TformRules<InRecord, OutRecord>, private idKey?: keyof InRecord) {}
 
-  // region Transformation methods.
+  private _processRules<T>(rules: TformRules<InRecord, T>, record: InRecord): OutRecord {
+    const results: any = {};
+    for (const key in rules) {
+      if (!rules.hasOwnProperty(key)) {
+        continue;
+      }
 
-  private processRules(rules: IRules<Record>, results: any, record: IJSONRecord) {
-    Object.keys(rules).forEach((key: string) => {
       const rule = rules[key];
-
       try {
-        if (_.isFunction(rule)) {
-          // If the rule is function, wrap record and pass as an argument.
-          const wrappedRecord = wrapRecord(record as any);
-          results[key] = (rule as any)(wrappedRecord);
-        } else {
-          // Otherwise, the rule is a nested map of rules.
-          results[key] = {};
-          this.processRules(rule as IRules<Record>, results[key], record);
-        }
+        // If rule is a function, call the rule function; otherwise traverse object.
+        results[key] = _.isFunction(rule) ? rule(RecordProxy(record)) : this._processRules(rule, record);
 
         if (results[key] === undefined) {
-          // noinspection ExceptionCaughtLocallyJS
-          throw Error(`property '${key}' of result is undefined`);
+          throw Error(`Property '${key}' of result is undefined`);
         }
 
         if (_.isString(results[key])) {
           results[key] = results[key].trim();
         }
       } catch (e) {
-        this.addError(e, record, key);
+        this._addError(e, record, key);
       }
-    });
-  }
+    }
 
-  public transform(record: IJSONRecord): IJSONRecord {
-    this.recordCount += 1;
-    this.verifyHasID(record);
-
-    const results: IJSONRecord = {};
-    this.processRules(this.rules, results, record);
     return results;
   }
 
-  // endregion
+  public transform(record: InRecord): OutRecord {
+    this.recordCount += 1;
+    this._verifyHasID(record);
+    return this._processRules(this.rules, record);
+  }
 
-  // region Error-handling methods.
-
-  public getErrors(): ITformError[] {
+  public getErrors(): Array<ITformError<InRecord>> {
     return this.errors;
   }
 
-  private verifyHasID(record: IJSONRecord) {
+  private _verifyHasID(record: InRecord) {
     if (this.idKey && !record[this.idKey]) {
-      this.addError(TypeError(`Missing ID key '${this.idKey}'`), record);
+      this._addError(TypeError(`Missing ID key '${this.idKey}'`), record);
     }
   }
 
-  private extractID(record: IJSONRecord) {
-    return this.idKey ? record[this.idKey] : undefined;
+  private _extractID(record: InRecord) {
+    return this.idKey && record[this.idKey] !== undefined ? `${record[this.idKey]}` : undefined;
   }
 
-  private addError(error: Error, record: IJSONRecord, field?: string) {
+  private _addError(error: Error, record: InRecord, field?: string) {
     this.errors.push({
       error,
       field,
 
-      recordId: this.extractID(record),
+      recordId: this._extractID(record),
       recordNo: this.recordCount,
       recordRaw: record,
     });
   }
-
-  // endregion
 }

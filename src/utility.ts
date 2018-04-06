@@ -12,6 +12,6 @@ export function splitList(delimiter: string, value: string): string[] {
     .filter(Boolean);
 }
 
-export function wrapList(obj: any) {
+export function wrapList<T>(obj: T): T[] {
   return obj ? [obj] : [];
 }
