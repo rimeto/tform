@@ -12,6 +12,9 @@ export function splitList(delimiter: string, value: string): string[] {
     .filter(Boolean);
 }
 
-export function wrapList<T>(obj: T): T[] {
-  return obj ? [obj] : [];
+export function wrapList<T>(obj: T): Array<NonNullable<T>> {
+  if (null === obj || undefined === obj) {
+    return [];
+  }
+  return [obj as NonNullable<T>];
 }
