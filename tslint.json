@@ -4,6 +4,7 @@
     "object-literal-sort-keys": false,
     "indent": [true, "spaces", 2],
     "max-line-length": false,
+    "member-ordering": false,
     "no-consecutive-blank-lines": [true, 2],
     "ordered-imports": [
       true,

@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "alwaysStrict": true,
+    "declaration": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "module": "commonjs",
@@ -11,7 +12,7 @@
     "outDir": "build",
     "preserveConstEnums": true,
     "pretty": true,
-    "removeComments": true,
+    "removeComments": false,
     "rootDir": "src",
     "sourceMap": false,
     "strict": true,
@@ -22,8 +23,8 @@
   "filesGlob": ["src/**/*.ts"],
 
   "exclude": [
-    "node_modules",
     "build",
+    "node_modules",
   ],
 
   "compileOnSave": false

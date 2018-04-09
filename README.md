@@ -2,8 +2,6 @@
 
 <br>
 
-_**[WARNING]** tform is in alpha and subject to imminent overhaul._
-
 ## Purpose
 
 Written in TypeScript and short for record transformer, Tform applies a given set of rules to transform JSON-like structured data into a different shape. Rules take the form of easy-to-read-and-write functional expressions that can be serialized and applied safely at runtime.
@@ -14,9 +12,9 @@ Transformation state does not persist between records. Tform works well as a pre
 ## Design Philosophy
 
 * *Easy-to-read-and-write rules.* Rules should be concise and comprehensible, providing an overview of the transformation at glance
-* *Extensible.* Third-party code can customize the transformation behaviour easily and flexibly.
+* *Extensible.* Third-party code can customize the transformation behavior easily and flexibly.
 * *Exception handling.* Tform handles errors gracefully, collecting errors to report later.
-* *Serializable.* Rules are simple enough to be serialized and thrown into a database. Tform provides deserialization functionality.
+* *Serializable.* Rules are simple enough to be serialized and thrown into a database. Tform provides de-serialization functionality.
 * *Type-checking.* Tform allows your rules to be type-checked at compile time.
 * *Statelessness.* State should be minimized, and where needed, made explicit.
 
@@ -30,24 +28,26 @@ Transformation state does not persist between records. Tform works well as a pre
 ## Overview of API
 
 1. Define an interface for your JSON input
-1. Define rules for transformation (or deserialize rules as described later on)
+1. Define rules for transformation (or de-serialize rules as described later on)
 1. Create a `Tform` instance
 1. Use the instance to transform records
 
+
+        interface IRawRecord {
+          ...
+        }
 
         interface IPerson {
           ...
         }
 
-        const record = ...;
+        const record: IRawRecord = ...;
 
-        const rules: IRules<IPerson> = ...;
+        const rules: IRules<IRawRecord, IPerson> = { ... };
 
-        const tform = new Tform<IPerson>(rules);
+        const tform = new Tform(rules);
         const output = tform.transform(record);
 
-
-If you prefer rules to not be type-checked, you can avoid defining an interface for your input JSON and replace `IRules<YourInterface>` with `IRules<any>`.
 
 
 ## Rules Syntax
@@ -80,11 +80,21 @@ You are encouraged to also create your own library of small, reusable functions 
       hobbies: string;
       address: {
         city: string;
-        zip: number;
+        zip: string;
       };
     }
 
-    const record = {
+    interface IRecord {
+      job: string;
+      name: string;
+      hobbies: string;
+      address: {
+        city: string;
+        zip: string | null;
+      };
+    }
+
+    const record: IRecord = {
       job: 'Engineer ',
       name: 'John Doe',
       hobbies: 'Biking; Skating;;',
@@ -94,16 +104,17 @@ You are encouraged to also create your own library of small, reusable functions 
       },
     };
 
-    const rules: IRules<IPerson> = {
-      job: (X) => X.job(),
+    const rules: IRules<IRecord, IPerson> = {
+      job: (X) => X.job(''),
       name: {
-        first: (X) => X.name().split(' ')[0],
-        last: (X) => X.name().split(' ')[1],
+        first: (X) => X.name('').split(' ')[0],
+        last: (X) => X.name('').split(' ')[1],
       },
       age: (X) => X.age(-1),
-      hobbies: (X) => splitList(X.hobbies()),
-      city: (X) => X.address().city,
-      zip: (X) => X.address().zip,
+      hobbies: (X) => splitList(';', X.hobbies('')),
+      address: {
+        city: (X) => X.address.city(''),
+        zip: (X) => X.address.zip(''),
       },
     };
 
@@ -132,4 +143,4 @@ By default, Tform reports which record caused the error as well as which field (
 
 ## License
 
-tform is is [MIT licensed](./LICENSE).
+tform is [MIT licensed](./LICENSE).
