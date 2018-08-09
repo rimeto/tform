@@ -3,7 +3,7 @@
   "version": "0.3.2",
   "description": "Transform JSON records easily",
   "main": "build/index.js",
-  "typings": "build/index.js",
+  "typings": "build/index.d.ts",
   "license": "MIT",
   "repository": "github:rimeto/tform",
   "scripts": {
@@ -58,7 +58,8 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.92",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "ts-optchain": "^0.1.0"
   },
   "engines": {
     "node": ">4"
