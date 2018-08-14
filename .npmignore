@@ -1,7 +1,4 @@
 # Files not needed as part of npm package
-
-# TypeScript source
+.vscode/
 src/
-
-# gitignore
-.gitignore
+tsconfig.json

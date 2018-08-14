@@ -6,8 +6,8 @@
  */
 
 import * as _ from 'lodash';
+import { oc, OCType } from 'ts-optchain';
 
-import { RecordProxy, TformRecordDataType } from './RecordProxy';
 export * from './utility';
 
 /**
@@ -15,8 +15,8 @@ export * from './utility';
  */
 export type TformRules<InRecord, OutRecord> = {
   [K in keyof OutRecord]: OutRecord[K] extends object
-    ? TformRules<InRecord, OutRecord[K]> | ((X: TformRecordDataType<InRecord>) => OutRecord[K])
-    : ((X: TformRecordDataType<InRecord>) => OutRecord[K])
+    ? TformRules<InRecord, OutRecord[K]> | ((X: OCType<InRecord>) => OutRecord[K])
+    : ((X: OCType<InRecord>) => OutRecord[K])
 };
 
 /**
@@ -47,7 +47,7 @@ export class Tform<InRecord, OutRecord> {
       const rule = rules[key];
       try {
         // If rule is a function, call the rule function; otherwise traverse object.
-        results[key] = _.isFunction(rule) ? rule(RecordProxy(record)) : this._processRules(rule, record);
+        results[key] = _.isFunction(rule) ? rule(oc(record)) : this._processRules(rule, record);
 
         if (results[key] === undefined) {
           throw Error(`Property '${key}' of result is undefined`);
