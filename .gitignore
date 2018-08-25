@@ -71,3 +71,6 @@ yarn-error.log
 
 # .vscode config
 .vscode/
+
+# OS X file
+.DS_store

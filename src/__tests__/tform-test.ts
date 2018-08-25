@@ -112,13 +112,6 @@ describe('tform', () => {
         recordNo: 2,
         recordRaw: {},
       },
-      {
-        error: Error("Property 'missing' of result is undefined"),
-        field: 'missing',
-        recordId: undefined,
-        recordNo: 2,
-        recordRaw: {},
-      },
     ]);
   });
 
@@ -134,21 +127,7 @@ describe('tform', () => {
     expect(tform.transform(record2)).toEqual({});
     expect(tform.getErrors()).toEqual([
       {
-        error: Error("Property 'missing' of result is undefined"),
-        field: 'missing',
-        recordId: '1',
-        recordNo: 1,
-        recordRaw: { pk: 1 },
-      },
-      {
         error: TypeError("Missing ID key 'pk'"),
-        recordNo: 2,
-        recordRaw: {},
-      },
-      {
-        error: Error("Property 'missing' of result is undefined"),
-        field: 'missing',
-        recordId: undefined,
         recordNo: 2,
         recordRaw: {},
       },

@@ -49,10 +49,6 @@ export class Tform<InRecord, OutRecord> {
         // If rule is a function, call the rule function; otherwise traverse object.
         results[key] = _.isFunction(rule) ? rule(oc(record)) : this._processRules(rule, record);
 
-        if (results[key] === undefined) {
-          throw Error(`Property '${key}' of result is undefined`);
-        }
-
         if (_.isString(results[key])) {
           results[key] = results[key].trim();
         }
