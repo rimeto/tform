@@ -1,6 +1,6 @@
 {
   "name": "tform",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Transform JSON records easily",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -59,7 +59,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.92",
     "lodash": "^4.17.4",
-    "ts-optchain": "^0.1.1"
+    "ts-optchain": "^0.1.2"
   },
   "engines": {
     "node": ">4"
