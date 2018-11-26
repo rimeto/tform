@@ -75,9 +75,12 @@ You are encouraged to also create your own library of small, reusable functions 
 
     interface IPerson {
       job: string;
-      name: string;
+      name: {
+        first: string;
+        last: string;
+      };
       age: number;
-      hobbies: string;
+      hobbies: string[];
       address: {
         city: string;
         zip: string;
