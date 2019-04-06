@@ -4085,10 +4085,10 @@ ts-jest@^22.0.0:
     pkg-dir "^2.0.0"
     yargs "^11.0.0"
 
-ts-optchain@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/ts-optchain/-/ts-optchain-0.1.2.tgz#41178e1b3268e5231078a24cb38cb07df0fc6e02"
-  integrity sha512-Xs1/xpXgTQhvgjP1qLIm5LWsgwAdpRnlfrHvMTyMPCNb4MP0WgYGCnK4xJBx0l4ZM+//IDubrmHkvp6BWfZfCg==
+ts-optchain@^0.1.5-beta.1:
+  version "0.1.5-beta.1"
+  resolved "https://registry.yarnpkg.com/ts-optchain/-/ts-optchain-0.1.5-beta.1.tgz#4d87e90e457fb71c859c172878799512953190d9"
+  integrity sha512-JNSFbqdMd2gI4hZMz6TydbEhHBFJGtUUj7q887K2vcWa/jJ5++cfXkauKU8ys8pVlPBtnRffYw/HlX177/Qctg==
 
 tslib@^1.8.0, tslib@^1.8.1:
   version "1.9.0"
