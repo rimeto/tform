@@ -1,4 +1,5 @@
 # Files not needed as part of npm package
+__tests__/
 .vscode/
 src/
 tsconfig.json
