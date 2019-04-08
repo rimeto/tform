@@ -1,6 +1,6 @@
 {
   "name": "tform",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Transform JSON records easily",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -17,12 +17,15 @@
   },
   "devDependencies": {
     "@types/jest": "^22.2.2",
+    "@types/lodash": "^4.14.92",
     "@types/node": "^9.4.6",
-    "husky": "^0.14.3",
+    "husky": "^1.3.1",
     "jest": "^22.0.3",
     "lint-staged": "^7.0.4",
+    "lodash": "^4.17.4",
     "prettier": "^1.9.2",
     "ts-jest": "^22.0.0",
+    "ts-optchain": "^0.1.5",
     "tslint": "^5.8.0",
     "typescript": "2.8.1"
   },
@@ -56,10 +59,9 @@
     "singleQuote": true,
     "trailingComma": "all"
   },
-  "dependencies": {
-    "@types/lodash": "^4.14.92",
+  "peerDependencies": {
     "lodash": "^4.17.4",
-    "ts-optchain": "^0.1.2"
+    "ts-optchain": "^0.1.5"
   },
   "engines": {
     "node": ">4"
