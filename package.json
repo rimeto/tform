@@ -25,7 +25,7 @@
     "lodash": "^4.17.4",
     "prettier": "^1.9.2",
     "ts-jest": "^22.0.0",
-    "ts-optchain": "^0.1.5-beta.1",
+    "ts-optchain": "^0.1.5",
     "tslint": "^5.8.0",
     "typescript": "2.8.1"
   },
@@ -60,8 +60,8 @@
     "trailingComma": "all"
   },
   "peerDependencies": {
-    "tslint": "^5.8.0",
-    "ts-optchain": "^0.1.2"
+    "lodash": "^4.17.4",
+    "ts-optchain": "^0.1.5"
   },
   "engines": {
     "node": ">4"
