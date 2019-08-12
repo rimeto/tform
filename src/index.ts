@@ -52,7 +52,12 @@ export class Tform<InRecord, OutRecord> {
       const rule = rules[key];
 
       if (_.isFunction(rule)) {
-        this.keyToInputKeyMap.set(key, new Set<string | number | symbol>());
+        // Make sure not to overwrite an existing mapping due to recursive traversal of rules.
+        const origSetFromMapKey = this.keyToInputKeyMap.get(key);
+        if (!origSetFromMapKey) {
+          this.keyToInputKeyMap.set(key, new Set<string | number | symbol>());
+        }
+
         const setFromMapKey = this.keyToInputKeyMap.get(key);
         if (!setFromMapKey) {
           this._addError(Error('Failed to add key to keyToInputKeyMap'), record, key);
