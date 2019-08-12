@@ -77,9 +77,22 @@ describe('tform', () => {
       },
     };
 
+    const expectedKeyToInputKeyMap = new Map<string | number | symbol, Set<string | number | symbol>>();
+    expectedKeyToInputKeyMap.set('job', new Set<string | number | symbol>());
+    const expectedJobInput = expectedKeyToInputKeyMap.get('job');
+    if (expectedJobInput) {
+      expectedJobInput.add('job');
+    }
+    expectedKeyToInputKeyMap.set('first', new Set<string | number | symbol>());
+    const expectedFirstInput = expectedKeyToInputKeyMap.get('first');
+    if (expectedFirstInput) {
+      expectedFirstInput.add('name');
+    }
     const tform = new Tform(rules);
     const output = tform.transform(record);
     expect(output).toEqual(expected);
+    expect(tform.getKeyToInputKeyMap().get('job')).toEqual(expectedJobInput);
+    expect(tform.getKeyToInputKeyMap().get('first')).toEqual(expectedFirstInput);
   });
 
   test('basic error handling', () => {
