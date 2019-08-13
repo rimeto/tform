@@ -32,8 +32,9 @@ export interface ITformError<InRecord> {
 }
 
 export class Tform<InRecord, OutRecord> {
+  private currentSetOfAccesses = new Set<string | number | symbol>();
   private errors: Array<ITformError<InRecord>> = [];
-  private keyToInputKeyMap: Map<string | number | symbol, Set<string | number | symbol>> = new Map<
+  private keyMap: Map<string | number | symbol, Set<string | number | symbol>> = new Map<
     string | number | symbol,
     Set<string | number | symbol>
   >();
@@ -41,40 +42,43 @@ export class Tform<InRecord, OutRecord> {
 
   constructor(private rules: TformRules<InRecord, OutRecord>, private idKey?: keyof InRecord) {}
 
-  private _processRules<T>(rules: TformRules<InRecord, T>, record: InRecord): OutRecord {
+  private _processRules<T>(
+    rules: TformRules<InRecord, T>,
+    record: InRecord,
+    wrappedRecord: ProxyHandler<any>,
+  ): OutRecord {
     const results: any = {};
-    let traceableRecordByKey;
     for (const key in rules) {
       if (!rules.hasOwnProperty(key)) {
         continue;
       }
 
       const rule = rules[key];
+      const ruleIsFunction = _.isFunction(rule);
 
-      if (_.isFunction(rule)) {
+      if (ruleIsFunction) {
         // Make sure not to overwrite an existing mapping due to recursive traversal of rules.
-        const origSetFromMapKey = this.keyToInputKeyMap.get(key);
-        if (!origSetFromMapKey) {
-          this.keyToInputKeyMap.set(key, new Set<string | number | symbol>());
-        }
-
-        const setFromMapKey = this.keyToInputKeyMap.get(key);
-        if (!setFromMapKey) {
-          this._addError(Error('Failed to add key to keyToInputKeyMap'), record, key);
-        } else {
-          traceableRecordByKey = this._tracePropAccess(oc(record), setFromMapKey);
+        const origSetFromMapKey = this.keyMap.get(key);
+        if (origSetFromMapKey) {
+          this.currentSetOfAccesses = origSetFromMapKey;
         }
       }
 
       try {
         // If rule is a function, call the rule function; otherwise traverse object.
-        results[key] = _.isFunction(rule) ? rule(traceableRecordByKey) : this._processRules(rule, record);
+        results[key] = _.isFunction(rule) ? rule(wrappedRecord) : this._processRules(rule, record, wrappedRecord);
 
         if (_.isString(results[key])) {
           results[key] = results[key].trim();
         }
       } catch (e) {
         this._addError(e, record, key);
+      }
+
+      if (ruleIsFunction) {
+        const fixedSetOfAccesses = new Set(this.currentSetOfAccesses);
+        this.keyMap.set(key, fixedSetOfAccesses);
+        this.currentSetOfAccesses.clear();
       }
     }
 
@@ -84,15 +88,16 @@ export class Tform<InRecord, OutRecord> {
   public transform(record: InRecord): OutRecord {
     this.recordCount += 1;
     this._verifyHasID(record);
-    return this._processRules(this.rules, record);
+    const traceableRecord = this._tracePropAccess(oc(record), this.currentSetOfAccesses);
+    return this._processRules(this.rules, record, traceableRecord);
   }
 
   public getErrors(): Array<ITformError<InRecord>> {
     return this.errors;
   }
 
-  public getKeyToInputKeyMap(): Map<string | number | symbol, Set<string | number | symbol>> {
-    return this.keyToInputKeyMap;
+  public getKeyMapAfterTransform(): Map<string | number | symbol, Set<string | number | symbol>> {
+    return this.keyMap;
   }
 
   private _verifyHasID(record: InRecord) {

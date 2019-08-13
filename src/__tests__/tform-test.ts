@@ -77,22 +77,22 @@ describe('tform', () => {
       },
     };
 
-    const expectedKeyToInputKeyMap = new Map<string | number | symbol, Set<string | number | symbol>>();
-    expectedKeyToInputKeyMap.set('job', new Set<string | number | symbol>());
-    const expectedJobInput = expectedKeyToInputKeyMap.get('job');
+    const expectedKeyMap = new Map<string | number | symbol, Set<string | number | symbol>>();
+    expectedKeyMap.set('job', new Set<string | number | symbol>());
+    const expectedJobInput = expectedKeyMap.get('job');
     if (expectedJobInput) {
       expectedJobInput.add('job');
     }
-    expectedKeyToInputKeyMap.set('first', new Set<string | number | symbol>());
-    const expectedFirstInput = expectedKeyToInputKeyMap.get('first');
+    expectedKeyMap.set('first', new Set<string | number | symbol>());
+    const expectedFirstInput = expectedKeyMap.get('first');
     if (expectedFirstInput) {
       expectedFirstInput.add('name');
     }
     const tform = new Tform(rules);
     const output = tform.transform(record);
     expect(output).toEqual(expected);
-    expect(tform.getKeyToInputKeyMap().get('job')).toEqual(expectedJobInput);
-    expect(tform.getKeyToInputKeyMap().get('first')).toEqual(expectedFirstInput);
+    expect(tform.getKeyMapAfterTransform().get('job')).toEqual(expectedJobInput);
+    expect(tform.getKeyMapAfterTransform().get('first')).toEqual(expectedFirstInput);
   });
 
   test('basic error handling', () => {
