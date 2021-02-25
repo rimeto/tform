@@ -1,3 +1,7 @@
+----
+**This project is now deprecated. Consider using [Optional Chaining](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html) instead.**
+----
+
 # tform
 
 <br>
